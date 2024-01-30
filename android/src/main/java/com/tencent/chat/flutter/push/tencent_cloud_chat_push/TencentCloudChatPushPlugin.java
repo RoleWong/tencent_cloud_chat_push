@@ -42,6 +42,8 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
 
     private Boolean registeredOnNotificationClickEvent = false;
 
+    private Boolean registeredOnAppWakeUpEvent = false;
+
     private Context mContext;
 
     @Override
@@ -83,6 +85,9 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
             case "registerOnNotificationClickedEvent":
                 registerOnNotificationClickedEvent(call, result);
                 break;
+            case "registerOnAppWakeUpEvent":
+                registerOnAppWakeUpEvent(call, result);
+                break;
             case "getAndroidPushToken":
                 getAndroidPushToken(call, result);
                 break;
@@ -104,56 +109,55 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
 
     public void toFlutterMethod(final String methodName, final String data) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (attachedToEngine) {
-                    channel.invokeMethod(methodName, data);
-                } else {
-                    // Create a timer that checks if attachedToEngine is true every 500 milliseconds
-                    final Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (attachedToEngine) {
-                                // If attachedToEngine is true, call invokeMethod and cancel the timer
-                                channel.invokeMethod(methodName, data);
-                                timer.cancel();
-                            }
+        handler.post(() -> {
+            if (attachedToEngine) {
+                channel.invokeMethod(methodName, data);
+            } else {
+                // Create a timer that checks if attachedToEngine is true every 500 milliseconds
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (attachedToEngine) {
+                            // If attachedToEngine is true, call invokeMethod and cancel the timer
+                            channel.invokeMethod(methodName, data);
+                            timer.cancel();
                         }
-                    }, 0, 500);
-                }
+                    }
+                }, 0, 500);
             }
         });
     }
 
-    public void tryNotifyDartOnNotificationClickEvent(final String extString) {
+    public void tryNotifyDartEvent(final String action, final String data) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (registeredOnNotificationClickEvent) {
-                    toFlutterMethod(Extras.ON_NOTIFICATION_CLICKED, extString);
-                } else {
-                    // Create a timer that checks if registeredOnNotificationClickEvent is true every 500 milliseconds
-                    final Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (registeredOnNotificationClickEvent) {
-                                // If registeredOnNotificationClickEvent is true, call toFlutterMethod and cancel the timer
-                                toFlutterMethod(Extras.ON_NOTIFICATION_CLICKED, extString);
-                                timer.cancel();
-                            }
+        handler.post(() -> {
+            if (registeredOnNotificationClickEvent) {
+                toFlutterMethod(action, data);
+            } else {
+                // Create a timer that checks if registeredOnNotificationClickEvent is true every 500 milliseconds
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (registeredOnNotificationClickEvent) {
+                            // If registeredOnNotificationClickEvent is true, call toFlutterMethod and cancel the timer
+                            toFlutterMethod(action, data);
+                            timer.cancel();
                         }
-                    }, 0, 500);
-                }
+                    }
+                }, 0, 500);
             }
         });
     }
 
     public void registerOnNotificationClickedEvent(@NonNull MethodCall call, @NonNull Result result) {
         registeredOnNotificationClickEvent = true;
+        result.success("");
+    }
+
+    public void registerOnAppWakeUpEvent(@NonNull MethodCall call, @NonNull Result result) {
+        registeredOnAppWakeUpEvent = true;
         result.success("");
     }
 

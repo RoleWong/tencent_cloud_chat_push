@@ -70,27 +70,28 @@ providers you want to support. You can include all or some of the providers list
 
 ```plaintext
 dependencies {
-    // Huawei
-    implementation 'com.tencent.testaar:huawei:1.2.1'
-
-    // XiaoMi
-    implementation 'com.tencent.testaar:xiaomi:1.2.1'
-
-    // OPPO
-    implementation 'com.tencent.testaar:oppo:1.2.1'
-
-    // Vivo
-    implementation 'com.tencent.testaar:vivo:1.2.1'
-
-    // Honor
-    implementation 'com.tencent.testaar:honor:1.2.1'
-
-    // Meizu
-    implementation 'com.tencent.testaar:meizu:1.2.1'
-
-    // Google Firebase Cloud Messaging (Google FCM)
-    implementation 'com.tencent.testaar:fcm:1.2.1'
+     // Huawei
+     implementation 'com.tencent.timpush:huawei:${The version of this package}'
+     
+     // XiaoMi
+     implementation 'com.tencent.timpush:xiaomi:${The version of this package}'
+     
+     // OPPO
+     implementation 'com.tencent.timpush:oppo:${The version of this package}'
+     
+     // vivo
+     implementation 'com.tencent.timpush:vivo:${The version of this package}'
+     
+     // Honor
+     implementation 'com.tencent.timpush:honor:${The version of this package}'
+     
+     // Meizu
+     implementation 'com.tencent.timpush:meizu:${The version of this package}'
+     
+     // Google Firebase Cloud Messaging (Google FCM)
+     implementation 'com.tencent.timpush:fcm:${The version of this package}'
 }
+
 ```
 
 ### Step 5: Handle notification click events and parse parameters
