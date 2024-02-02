@@ -16,6 +16,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import io.flutter.app.FlutterApplication;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.FlutterEngineCache;
+import io.flutter.embedding.engine.dart.DartExecutor;
 
 public class TencentCloudChatPushApplication extends FlutterApplication {
     private String TAG = "TencentCloudChatPushApplication";
@@ -27,11 +30,16 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_DISABLE_AUTO_REGISTER_PUSH, null);
         registerOnNotificationClickedEventToTUICore();
         registerOnAppWakeUp();
+
+        FlutterEngine engine = new FlutterEngine(this);
+        engine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
+        FlutterEngineCache.getInstance().put(Extras.FLUTTER_ENGINE, engine);
     }
 
-    private void launchMainActivity() {
+    private void launchMainActivity(boolean showInForeground) {
         Intent intentLaunchMain = this.getPackageManager().getLaunchIntentForPackage(this.getPackageName());
         if (intentLaunchMain != null) {
+            intentLaunchMain.putExtra(Extras.SHOW_IN_FOREGROUND, showInForeground);
             this.startActivity(intentLaunchMain);
         } else {
             Log.e(TAG, "Failed to get launch intent for package: " + this.getPackageName());
@@ -50,7 +58,7 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
                         Log.i(TAG, "Checking attachedToEngine: " + TencentCloudChatPushPlugin.instance.attachedToEngine);
 
                         if (TencentCloudChatPushPlugin.instance != null && TencentCloudChatPushPlugin.instance.attachedToEngine) {
-                            Log.i(TAG, "invoke" + action);
+                            Log.i(TAG, "invoke: " + action);
                             TencentCloudChatPushPlugin.instance.tryNotifyDartEvent(action, data);
                             timer.cancel();
                         }
@@ -67,7 +75,7 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
         TUICore.registerEvent(TUIConstants.TIMPush.EVENT_NOTIFY,
                 TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION, (key, subKey, param) -> {
                     Log.d(TAG, "onNotifyEvent onclick key = " + key + "subKey = " + subKey);
-                    launchMainActivity();
+                    launchMainActivity(true);
                     if (TUIConstants.TIMPush.EVENT_NOTIFY.equals(key)) {
                         if (TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION.equals(subKey)) {
                             if (param != null) {
@@ -82,14 +90,11 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
 
     private void registerOnAppWakeUp() {
         Log.d(TAG, "registerOnAppWakeUp");
-        TUICore.registerEvent("eventIMloginAfterAppWakeUpKey", "eventIMloginAfterAppWakeUpSubKey", new ITUINotification() {
-            @Override
-            public void onNotifyEvent(String key, String subKey, Map<String, Object> param) {
-                Log.d(TAG, "onNotifyEvent key = " + key + "subKey = " + subKey);
-                if ("eventIMloginAfterAppWakeUpKey".equals(key)) {
-                    if ("eventIMloginAfterAppWakeUpSubKey".equals(subKey)) {
-                        scheduleCheckPluginInstanceAndNotifyForOnClick(Extras.ON_APP_WAKE_UP, "");
-                    }
+        TUICore.registerEvent(TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_KEY, TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_SUB_KEY, (key, subKey, param) -> {
+            Log.d(TAG, "onNotifyEvent key = " + key + "subKey = " + subKey);
+            if (TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_KEY.equals(key)) {
+                if (TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_SUB_KEY.equals(subKey)) {
+                    scheduleCheckPluginInstanceAndNotifyForOnClick(Extras.ON_APP_WAKE_UP, "");
                 }
             }
         });

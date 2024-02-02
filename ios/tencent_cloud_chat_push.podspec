@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tencent_cloud_chat_push'
-  s.version          = '7.8'
+  s.version          = '7.8.5483'
   s.summary          = 'Notification push for Tencent Cloud Chat.'
   s.description      = <<-DESC
 Notification push for Tencent Cloud Chat.
@@ -21,6 +21,6 @@ Notification push for Tencent Cloud Chat.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
 
-  s.dependency 'TIMPush', ">= 7.7.5283"
+  s.dependency 'TIMPush', ">= 7.8.5483"
   s.dependency 'TUICore'
 end
