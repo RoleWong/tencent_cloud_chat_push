@@ -51,11 +51,67 @@ instructions provided and copy the provided code snippets to the specified files
 Edit the `ios/Runner/AppDelegate.swift` file and paste the provided code snippet as shown in the
 example.
 
+```Swift
+import UIKit
+import Flutter
+
+// Add these two import lines
+import TIMPush
+import tencent_cloud_chat_push
+
+// Add `, TIMPushDelegate` to the following line
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate, TIMPushDelegate {
+    
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        GeneratedPluginRegistrant.register(with: self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    // Add this function
+    func offlinePushCertificateID() -> Int32 {
+        return TencentCloudChatPushFlutterModal.shared.offlinePushCertificateID();
+    }
+    
+    // Add this function
+    func applicationGroupID() -> String {
+        return TencentCloudChatPushFlutterModal.shared.applicationGroupID()
+    }
+    
+    // Add this function
+    func onRemoteNotificationReceived(_ notice: String?) -> Bool {
+        TencentCloudChatPushPlugin.shared.tryNotifyDartOnNotificationClickEvent(notice)
+        return true
+    }
+}
+```
+
 #### Android
 
 Create a new `Application` class file in the `android` directory of your project, for
 example, `MyApplication.java`. If you have already created a custom `Application` class for other
 purposes, you can reuse it without creating a new one.
+
+```java
+import com.tencent.chat.flutter.push.tencent_cloud_chat_push.application.TencentCloudChatPushApplication;
+public class MyApplication extends TencentCloudChatPushApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+}
+```
+
+Declare it in `AndroidManifest.xml` file, like:
+
+```xml
+<application
+        android:name="${Package Name}.MyApplication"
+... more
+```
 
 ### Step 4: Configure push notification providers
 
@@ -100,12 +156,7 @@ Define a function to handle push notification click events. This function should
 signature:
 
 ```dart
-void onNotificationClicked
-(
-{
-required
-String
-ext, String? userID, String? groupID})
+void onNotificationClicked({requiredS tring ext, String? userID, String? groupID})
 ```
 
 The `ext` parameter contains the full ext information for the message, as specified by the sender.
@@ -127,11 +178,5 @@ Optionally, you can also pass in the `apnsCertificateID` for iOS and `androidPus
 Android if needed:
 
 ```dart
-TencentCloudChatPush
-().registerPush
-(
-onNotificationClicked
-:
-_onNotificationClicked
-);
+TencentCloudChatPush().registerPush(onNotificationClicked: _onNotificationClicked);
 ```
