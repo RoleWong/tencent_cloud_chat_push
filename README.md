@@ -27,7 +27,7 @@ flutter pub add tencent_cloud_chat_push
 
 #### iOS
 
-Upload your iOS APNs push certificate to the IM console and obtain the certificate ID. Call
+Upload your iOS APNs push certificate to the Tencent Cloud Chat console and obtain the certificate ID. Call
 the `TencentCloudChatPush().setApnsCertificateID` method as early as possible in your app's
 lifecycle and pass in the certificate ID:
 
@@ -156,7 +156,7 @@ Define a function to handle push notification click events. This function should
 signature:
 
 ```dart
-void onNotificationClicked({requiredS tring ext, String? userID, String? groupID})
+void onNotificationClicked({required String ext, String? userID, String? groupID})
 ```
 
 The `ext` parameter contains the full ext information for the message, as specified by the sender.
@@ -171,8 +171,8 @@ If parsing fails, they will be null.
 ### Step 6: Register the push plugin
 
 Register the push plugin by calling the `TencentCloudChatPush().registerPush` method after
-successfully logging in to the IM module and before using any other plugins (such as CallKit). Pass
-in the click callback function defined in the previous step.
+successfully logging in to the Tencent Cloud Chat module and before using any other plugins (such as CallKit).
+Pass in the click callback function defined in the previous step.
 
 Optionally, you can also pass in the `apnsCertificateID` for iOS and `androidPushOEMConfig` for
 Android if needed:
