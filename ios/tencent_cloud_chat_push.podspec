@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Notification push for Tencent Cloud Chat.
                        DESC
-  s.homepage         = 'https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn'
+  s.homepage         = 'https://trtc.io/products/chat?utm_source=flutter_demo&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Tencent' => 'owennwang@tencent.com' }
   s.source           = { :path => '.' }

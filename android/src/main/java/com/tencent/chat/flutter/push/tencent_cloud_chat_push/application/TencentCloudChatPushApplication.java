@@ -9,7 +9,6 @@ import com.tencent.chat.flutter.push.tencent_cloud_chat_push.TencentCloudChatPus
 import com.tencent.chat.flutter.push.tencent_cloud_chat_push.common.Extras;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
 
 import java.util.Map;
 import java.util.Timer;
@@ -23,17 +22,29 @@ import io.flutter.embedding.engine.dart.DartExecutor;
 public class TencentCloudChatPushApplication extends FlutterApplication {
     private String TAG = "TencentCloudChatPushApplication";
 
+    public static boolean useCustomFlutterEngine = false;
+    public static boolean hadLaunchedMainActivity = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
-
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_DISABLE_AUTO_REGISTER_PUSH, null);
         registerOnNotificationClickedEventToTUICore();
         registerOnAppWakeUp();
+    }
 
-        FlutterEngine engine = new FlutterEngine(this);
-        engine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
-        FlutterEngineCache.getInstance().put(Extras.FLUTTER_ENGINE, engine);
+    private void generateFlutterEngine(){
+        if (FlutterEngineCache.getInstance().contains(Extras.FLUTTER_ENGINE) || hadLaunchedMainActivity) {
+            return;
+        }
+
+        new Handler(Looper.getMainLooper()).post(() -> {
+            useCustomFlutterEngine = true;
+            FlutterEngine engine = new FlutterEngine(this);
+            engine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
+            FlutterEngineCache.getInstance().put(Extras.FLUTTER_ENGINE, engine);
+            FlutterEngineCache cache = FlutterEngineCache.getInstance();
+        });
     }
 
     private void launchMainActivity(boolean showInForeground) {
@@ -94,6 +105,7 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
             Log.d(TAG, "onNotifyEvent key = " + key + "subKey = " + subKey);
             if (TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_KEY.equals(key)) {
                 if (TUIConstants.TIMPush.EVENT_IM_LOGIN_AFTER_APP_WAKEUP_SUB_KEY.equals(subKey)) {
+                    generateFlutterEngine();
                     scheduleCheckPluginInstanceAndNotifyForOnClick(Extras.ON_APP_WAKE_UP, "");
                 }
             }

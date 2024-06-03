@@ -196,10 +196,14 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, useMethod, param, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
-                if (errorCode == 0) {
-                    result.success("");
-                } else {
-                    result.error(String.valueOf(errorCode), errorMessage, errorMessage);
+                try {
+                    if (errorCode == 0) {
+                        result.success("");
+                    } else {
+                        result.error(String.valueOf(errorCode), errorMessage, errorMessage);
+                    }
+                }catch (Exception e){
+                    Log.d(TAG, errorMessage);
                 }
             }
         });
